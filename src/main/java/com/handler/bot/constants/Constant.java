@@ -1,7 +1,5 @@
 package com.handler.bot.constants;
 
-import java.net.URI;
-
 public class Constant {
     public static final String NEOTRADEAPI = "";
     public static final String MARKET_DATA_URL = "";
