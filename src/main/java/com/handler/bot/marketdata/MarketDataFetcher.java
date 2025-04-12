@@ -2,10 +2,12 @@ package com.handler.bot.marketdata;
 
 import com.handler.bot.service.AuthService;
 import org.springframework.http.*;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import static com.handler.bot.constants.Constant.MARKET_DATA_URL;
 
+@Service
 public class MarketDataFetcher {
 
     private final AuthService authService;
