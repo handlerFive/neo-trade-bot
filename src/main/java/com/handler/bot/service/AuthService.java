@@ -2,7 +2,6 @@ package com.handler.bot.service;
 
 import com.handler.bot.component.TokenStorage;
 import com.handler.bot.constants.Constant;
-import com.handler.bot.model.TotpLoginReq;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,15 +15,17 @@ import org.wso2.client.api.ApiException;
 import org.wso2.client.api.Configuration;
 import org.wso2.client.api.Login.TotpApi;
 import org.wso2.client.api.auth.OAuth;
+import org.wso2.client.model.Login.InlineObject4;
+import org.wso2.client.model.Login.InlineObject5;
 import org.wso2.client.model.Login.InlineResponse2003;
+import org.wso2.client.model.Login.InlineResponse2004;
 
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.handler.bot.constants.Constant.BASE_URL;
-import static com.handler.bot.constants.Constant.TOTP_LOGIN_BASE_URL;
+import static com.handler.bot.constants.Constant.*;
 
 @Slf4j
 @Service
@@ -35,6 +36,9 @@ public class AuthService {
 
     @Value("${CLIENT_SECRET}")
     private String clientSecret;
+
+    @Value("${CLIENT_PIN}")
+    private String clientPin;
 
     private String accessToken;
     private final RestTemplate restTemplate = new RestTemplate();
@@ -98,15 +102,36 @@ public class AuthService {
         }
     }
 
-    public Optional<InlineResponse2003> loginWithTOTP(TotpLoginReq payload) {
+    public Optional<InlineResponse2003> generateViewToken(InlineObject4 payload) {
         ApiClient defaultClient = Configuration.getDefaultApiClient();
         defaultClient.setBasePath(TOTP_LOGIN_BASE_URL);
         OAuth oAuth = (OAuth) defaultClient.getAuthentication("default");
         oAuth.setAccessToken(getAccessToken());
         TotpApi apiInstance = new TotpApi(defaultClient);
         try {
-            InlineResponse2003 response = apiInstance.loginV6TotpLoginPost("neotradeapi", payload);
+            InlineResponse2003 response = apiInstance.loginV6TotpLoginPost(NEOTRADEAPI, payload);
             return Optional.ofNullable(response);
+        } catch (ApiException e) {
+            logger.error("TOTP login failed. Status code: {}, Reason: {}, Response: {}",
+                    e.getCode(), e.getMessage(), e.getResponseBody(), e);
+            return Optional.empty();
+        } catch (Exception e) {
+            logger.error("Unexpected exception during TOTP login", e);
+            return Optional.empty();
+        }
+    }
+
+    public Optional<InlineResponse2004> generateFinalSessionToken(String sId, String authToken) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+        defaultClient.setBasePath(TOTP_LOGIN_BASE_URL);
+        OAuth oAuth = (OAuth) defaultClient.getAuthentication("default");
+        oAuth.setAccessToken(generateBasicToken());
+        TotpApi apiInstance = new TotpApi(defaultClient);
+        try {
+            InlineObject5 payload = new InlineObject5();
+            payload.setMpin(clientPin);
+            InlineResponse2004 inlineResponse2004 = apiInstance.loginV6TotpValidatePost(sId, authToken, NEOTRADEAPI, payload);
+            return Optional.ofNullable(inlineResponse2004);
         } catch (ApiException e) {
             logger.error("TOTP login failed. Status code: {}, Reason: {}, Response: {}",
                     e.getCode(), e.getMessage(), e.getResponseBody(), e);
@@ -128,7 +153,7 @@ public class AuthService {
     public String refreshAccessToken() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setBasicAuth("CLIENT_KEY", "CLIENT_SECRET"); // Replace with actual credentials
+        headers.setBasicAuth("CLIENT_KEY", "CLIENT_SECRET");
 
         HttpEntity<String> request = new HttpEntity<>("grant_type=client_credentials", headers);
         ResponseEntity<Map> response = restTemplate.exchange(AUTH_URL, HttpMethod.POST, request, Map.class);
