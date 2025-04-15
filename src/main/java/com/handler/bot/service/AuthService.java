@@ -46,7 +46,7 @@ public class AuthService {
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
     private final TokenStorage tokenStorage;
 
-    public AuthService(WebClient.Builder webClientBuilder, TokenStorage tokenStorage) {
+    public AuthService(TokenStorage tokenStorage) {
         this.tokenStorage = tokenStorage;
     }
 

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,7 @@ public class MasterScripLoader {
     @NotNull
     private static ScripMaster getScripMaster(String[] tokens) {
         ScripMaster scrip = new ScripMaster();
+        logger.info("Tokens : {}" , Arrays.stream(tokens).toList());
         scrip.setPSymbol(tokens[4]);
         scrip.setPTrdSymbol(tokens[5]);
         scrip.setPScripRefKey(tokens[7]);

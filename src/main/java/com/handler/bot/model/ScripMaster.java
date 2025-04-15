@@ -18,18 +18,4 @@ public class ScripMaster {
     private int lLotSize;
     private long lExpiryDate;
 
-    @Override
-    public String toString() {
-        return "ScripMaster{" +
-                "pSymbol='" + pSymbol + '\'' +
-                ", pTrdSymbol='" + pTrdSymbol + '\'' +
-                ", pScripRefKey='" + pScripRefKey + '\'' +
-                ", pExSeg='" + pExSeg + '\'' +
-                ", pInstType='" + pInstType + '\'' +
-                ", pOptionType='" + pOptionType + '\'' +
-                ", dStrikePrice=" + dStrikePrice +
-                ", lLotSize=" + lLotSize +
-                ", lExpiryDate=" + lExpiryDate +
-                '}';
-    }
 }

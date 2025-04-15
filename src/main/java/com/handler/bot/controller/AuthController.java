@@ -54,8 +54,10 @@ public class AuthController {
             if (data != null) {
                 finalSessionData = authService.generateFinalSessionToken(data.getSid(), data.getToken());
                 if (finalSessionData.isPresent() && finalSessionData.get().getData() != null) {
-                    String sessionToken = finalSessionData.get().getData().getToken();  // Assuming `getData().getToken()` gives your final token.
+                    String sessionToken = finalSessionData.get().getData().getToken();
+                    String sId = finalSessionData.get().getData().getSid();
                     sessionTokenStorage.setSessionToken(sessionToken);
+                    sessionTokenStorage.setSid(sId);
                     logger.info("Final Session Token Stored : {}", sessionTokenStorage.getSessionToken());
                 } else {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("MPIN Validation Failed.");

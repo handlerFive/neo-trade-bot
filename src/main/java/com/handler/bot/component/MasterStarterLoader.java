@@ -17,12 +17,12 @@ import static com.handler.bot.constants.Constant.CSV_DOWNLOAD_PATH;
 @Component
 public class MasterStarterLoader {
 
+    @Getter
+    private List<ScripMaster> scripMasterList;
     private final MasterScripLoader masterScripLoader;
     private static final Logger logger = LoggerFactory.getLogger(MasterStarterLoader.class);
     private final ScripMasterService scripMasterService;
     private final AuthService authService;
-    @Getter
-    private List<ScripMaster> scripMasterList;
 
     public MasterStarterLoader(MasterScripLoader masterScripLoader, List<ScripMaster> scripMasterList, ScripMasterService scripMasterService, TokenStorage tokenStorage, AuthService authService) {
         this.masterScripLoader = masterScripLoader;
@@ -34,7 +34,9 @@ public class MasterStarterLoader {
     public void init() {
         logger.info("MasterStarterLoader");
         scripMasterService.fetchAndStoreMasterScrips(authService.getAccessToken());
-        scripMasterList = masterScripLoader.loadFromCsv(CSV_DOWNLOAD_PATH + "/nse_fo.csvnse_fo.csv");
+        scripMasterList = masterScripLoader.loadFromCsv(CSV_DOWNLOAD_PATH + "/nse_cm-v1.csvnse_cm-v1.csv");
         logger.info("Scrip Master List : {}", scripMasterList.toString());
+        List<ScripMaster>  scripMasterList1 = masterScripLoader.findOptionsBySymbol(scripMasterList,"BANKNIFTY","");
+        logger.info("FindOptionsBySymbol {}", scripMasterList1);
     }
 }
