@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.wso2.client.api.ApiClient;
 import org.wso2.client.api.ApiException;
 import org.wso2.client.api.Configuration;
@@ -109,7 +108,7 @@ public class AuthService {
         oAuth.setAccessToken(getAccessToken());
         TotpApi apiInstance = new TotpApi(defaultClient);
         try {
-            InlineResponse2003 response = apiInstance.loginV6TotpLoginPost(NEOTRADEAPI, payload);
+            InlineResponse2003 response = apiInstance.loginV6TotpLoginPost(API_SUB_KEY, payload);
             return Optional.ofNullable(response);
         } catch (ApiException e) {
             logger.error("TOTP login failed. Status code: {}, Reason: {}, Response: {}",
@@ -130,7 +129,7 @@ public class AuthService {
         try {
             InlineObject5 payload = new InlineObject5();
             payload.setMpin(clientPin);
-            InlineResponse2004 inlineResponse2004 = apiInstance.loginV6TotpValidatePost(sId, authToken, NEOTRADEAPI, payload);
+            InlineResponse2004 inlineResponse2004 = apiInstance.loginV6TotpValidatePost(sId, authToken, API_SUB_KEY, payload);
             return Optional.ofNullable(inlineResponse2004);
         } catch (ApiException e) {
             logger.error("TOTP login failed. Status code: {}, Reason: {}, Response: {}",

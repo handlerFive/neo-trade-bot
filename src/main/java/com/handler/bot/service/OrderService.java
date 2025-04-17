@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import static com.handler.bot.constants.Constant.NEOTRADEAPI;
+import static com.handler.bot.constants.Constant.API_SUB_KEY;
 import static com.handler.bot.constants.Constant.ORDER_URL;
 
 @Service
@@ -36,7 +36,7 @@ public class OrderService {
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .header("Sid", sessionTokenStorage.getSid())
                 .header("Auth", sessionTokenStorage.getSessionToken())
-                .header("neo-fin-key", NEOTRADEAPI)
+                .header("neo-fin-key", API_SUB_KEY)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .header("Authorization", "Bearer " + authService.getAccessToken())
                 .bodyValue("jData=" + jDataJson)
