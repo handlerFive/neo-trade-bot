@@ -1,5 +1,6 @@
 package com.handler.bot.controller;
 
+import com.handler.bot.model.OrderModifyReq;
 import com.handler.bot.model.OrderReq;
 import com.handler.bot.model.OrderRes;
 import com.handler.bot.service.OrderService;
@@ -24,5 +25,11 @@ public class OrderController {
     public void placeOrder(@RequestBody OrderReq orderReq) {
         OrderRes orderRes = orderService.placeOrder(orderReq);
         logger.info("Order Placed {}", orderRes);
+    }
+
+    @PostMapping("/mod")
+    public void modifyOrder(@RequestBody OrderModifyReq orderModifyReq) {
+        OrderRes orderRes = orderService.modifyOrder(orderModifyReq);
+        logger.info("Order Modified {}", orderRes);
     }
 }

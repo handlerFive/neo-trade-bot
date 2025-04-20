@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.handler.bot.constants.Constant.ORDER_URL;
+import static com.handler.bot.constants.Constant.ORDER_PLACE_URL;
 
 @Service
 public class OrderExecutorService {
@@ -49,7 +49,7 @@ public class OrderExecutorService {
         Map<String, Object> orderDetails = getStringObjectMap(symbol, orderType, price);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(orderDetails, headers);
-        ResponseEntity<String> response = restTemplate.exchange(ORDER_URL, HttpMethod.POST, request, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(ORDER_PLACE_URL, HttpMethod.POST, request, String.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
             System.out.println("Order placed successfully: " + response.getBody());

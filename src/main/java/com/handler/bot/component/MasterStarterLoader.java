@@ -11,14 +11,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.handler.bot.constants.Constant.CSV_DOWNLOAD_PATH;
+import static com.handler.bot.constants.Constant.NSE_FO_MARKET_SCRIPT_NAME;
 
 @Component
 public class MasterStarterLoader {
 
     @Getter
-    private List<ScripMaster> scripMasterList;
+    private Map<String, ScripMaster> scripMasterList;
     private final MasterScripLoader masterScripLoader;
     private static final Logger logger = LoggerFactory.getLogger(MasterStarterLoader.class);
     private final ScripMasterService scripMasterService;
@@ -34,9 +36,12 @@ public class MasterStarterLoader {
     public void init() {
         logger.info("MasterStarterLoader");
         scripMasterService.fetchAndStoreMasterScrips(authService.getAccessToken());
-        scripMasterList = masterScripLoader.loadFromCsv(CSV_DOWNLOAD_PATH + "/nse_cm-v1.csvnse_cm-v1.csv");
+        scripMasterList = masterScripLoader.parseScripMaster(CSV_DOWNLOAD_PATH + NSE_FO_MARKET_SCRIPT_NAME);
         logger.info("Scrip Master List : {}", scripMasterList.toString());
-        List<ScripMaster>  scripMasterList1 = masterScripLoader.findOptionsBySymbol(scripMasterList,"BANKNIFTY","");
-        logger.info("FindOptionsBySymbol {}", scripMasterList1);
+        List<ScripMaster> scripMasterList1 = masterScripLoader.findOptionsBySymbol(scripMasterList,
+                "DABUR", "");
+        for (ScripMaster s : scripMasterList1) {
+            logger.info("FindOptionsBySymbol : {}", s);
+        }
     }
 }

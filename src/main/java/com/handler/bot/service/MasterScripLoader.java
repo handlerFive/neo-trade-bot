@@ -1,16 +1,16 @@
 package com.handler.bot.service;
 
 import com.handler.bot.model.ScripMaster;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,61 +18,54 @@ public class MasterScripLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterScripLoader.class);
 
-    public List<ScripMaster> loadFromCsv(String filePath) {
-        List<ScripMaster> scripList = new ArrayList<>();
+    public Map<String, ScripMaster> parseScripMaster(String filePath) {
+        Map<String, ScripMaster> scripMap = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            boolean isHeader = true;
-            while ((line = br.readLine()) != null) {
-                if (isHeader) {
-                    isHeader = false; // Skip header
-                    continue;
-                }
-                String[] tokens = line.split(",");
-                if (tokens.length < 60) {
-                    continue;
-                }
-                ScripMaster scrip = getScripMaster(tokens);
-                scripList.add(scrip);
+            String headerLine = br.readLine();
+            if (headerLine == null) throw new RuntimeException("CSV is empty!");
+            String[] headers = headerLine.split(",", -1);
+            Map<String, Integer> headerIndex = new HashMap<>();
+            for (int i = 0; i < headers.length; i++) {
+                headerIndex.put(headers[i].trim(), i);
             }
-        } catch (Exception e) {
-            logger.info("Exception in Master Scrip Loader: ", e);
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",", -1);
+                ScripMaster dto = new ScripMaster();
+                dto.setTk(getValue(headerIndex, values, "pSymbol"));
+                dto.setSymbol(getValue(headerIndex, values, "pSymbolName"));
+                dto.setTradingSymbol(getValue(headerIndex, values, "pTrdSymbol"));
+                dto.setExchange(getValue(headerIndex, values, "pExchSeg"));
+                dto.setInstrumentType(getValue(headerIndex, values, "pInstType"));
+                dto.setScripRefKey(getValue(headerIndex, values, "pScripRefKey"));
+                dto.setISin(getValue(headerIndex, values, "pISIN"));
+                dto.setAssetCode(getValue(headerIndex, values, "pAssetCode"));
+                dto.setExpiryDate(getValue(headerIndex, values, "lExpiryDate"));
+                dto.setLotSize(getValue(headerIndex, values, "lLotSize"));
+                dto.setDescription(getValue(headerIndex, values, "pDesc"));
+                dto.setOptionType(getValue(headerIndex, values, "pOptionType"));
+                if (dto.getTradingSymbol() != null) {
+                    scripMap.put(dto.getTradingSymbol(), dto);
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Error reading Scrip Master CSV: ", e);
         }
-        return scripList;
+        return scripMap;
     }
 
-    @NotNull
-    private static ScripMaster getScripMaster(String[] tokens) {
-        ScripMaster scrip = new ScripMaster();
-        logger.info("Tokens : {}" , Arrays.stream(tokens).toList());
-        scrip.setPSymbol(tokens[4]);
-        scrip.setPTrdSymbol(tokens[5]);
-        scrip.setPScripRefKey(tokens[7]);
-        scrip.setPExSeg(tokens[3]);
-        scrip.setPInstType(tokens[2]);
-        scrip.setPOptionType(tokens[6]);
-        try {
-            scrip.setDStrikePrice(Double.parseDouble(tokens[15]));
-        } catch (Exception e) {
-            scrip.setDStrikePrice(0);
+    private String getValue(Map<String, Integer> headerIndex, String[] values, String columnName) {
+        Integer index = headerIndex.get(columnName);
+        if (index != null && index < values.length) {
+            return values[index].trim();
         }
-        try {
-            scrip.setLLotSize(Integer.parseInt(tokens[16]));
-        } catch (Exception e) {
-            scrip.setLLotSize(0);
-        }
-        try {
-            scrip.setLExpiryDate(Long.parseLong(tokens[17]));
-        } catch (Exception e) {
-            scrip.setLExpiryDate(0);
-        }
-        return scrip;
+        return null;
     }
 
-    public List<ScripMaster> findOptionsBySymbol(List<ScripMaster> list, String symbol, String optionType) {
-        return list.stream()
-                .filter(s -> s.getPSymbol().equalsIgnoreCase(symbol))
-                .filter(s -> s.getPOptionType().equalsIgnoreCase(optionType))
+    public List<ScripMaster> findOptionsBySymbol(Map<String, ScripMaster> scripMap, String symbol, String optionType) {
+        return scripMap.values().stream()
+                .filter(s -> s.getSymbol() != null && s.getSymbol().equalsIgnoreCase(symbol))
+                .filter(s -> s.getOptionType() != null && s.getOptionType().equalsIgnoreCase(optionType))
                 .collect(Collectors.toList());
     }
 }

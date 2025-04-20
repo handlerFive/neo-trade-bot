@@ -1,21 +1,20 @@
 package com.handler.bot.model;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class ScripMaster {
-    @Getter
-    @Setter
-    private String pSymbol;
-    private String pTrdSymbol;
-    private String pScripRefKey;
-    private String pExSeg;
-    private String pInstType;
-    private String pOptionType;
-    private double dStrikePrice;
-    private int lLotSize;
-    private long lExpiryDate;
 
+    private String tk;               // Token ID
+    private String symbol;           // pSymbol
+    private String tradingSymbol;    // pTrdSymbol
+    private String exchange;         // pExchangeSeg
+    private String instrumentType;   // pInstType
+    private String scripRefKey;      // pScripRefKey
+    private String iSin;             // piSIN
+    private String assetCode;        // pAssetCode
+    private String expiryDate;       // pExpiryDate
+    private String lotSize;          // lLotSize
+    private String description;      // pDesc
+    private String optionType;       // pOptionType
 }
