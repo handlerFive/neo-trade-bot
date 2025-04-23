@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -57,7 +58,13 @@ public class AuthService {
         headers.set("Authorization", "Basic " + encodedAuth);
         String requestBody = "grant_type=client_credentials";
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<Map> response = restTemplate.exchange(AUTH_URL, HttpMethod.POST, requestEntity, Map.class);
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                AUTH_URL,
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<>() {
+                }
+        );
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
             accessToken = (String) response.getBody().get("access_token");
             return accessToken;

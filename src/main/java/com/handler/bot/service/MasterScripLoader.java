@@ -65,7 +65,9 @@ public class MasterScripLoader {
     public List<ScripMaster> findOptionsBySymbol(Map<String, ScripMaster> scripMap, String symbol, String optionType) {
         return scripMap.values().stream()
                 .filter(s -> s.getSymbol() != null && s.getSymbol().equalsIgnoreCase(symbol))
+                .peek(scripMaster -> logger.info("Scrip Display 1 : {}" , scripMaster))
                 .filter(s -> s.getOptionType() != null && s.getOptionType().equalsIgnoreCase(optionType))
+                .peek(scripMaster -> logger.info("Scrip Display 2 : {}" , scripMaster))
                 .collect(Collectors.toList());
     }
 }

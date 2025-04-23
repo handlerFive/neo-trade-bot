@@ -4,8 +4,7 @@ import com.handler.bot.service.AuthService;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import static com.handler.bot.constants.Constant.MARKET_DATA_URL;
+import static com.handler.bot.constants.Constant.QUOTES_URL;
 
 @Service
 public class MarketDataFetcher {
@@ -21,7 +20,7 @@ public class MarketDataFetcher {
         headers.set("Authorization", "Bearer " + authService.getAccessToken());
         HttpEntity<String> request = new HttpEntity<>(headers);
 
-        String url = MARKET_DATA_URL + "?symbol=" + symbol;
+        String url = QUOTES_URL + "?symbol=" + symbol;
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
