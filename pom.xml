@@ -97,6 +97,11 @@
 			<artifactId>gson-fire</artifactId>
 			<version>1.8.5</version> <!-- Or latest -->
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.13.1</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>

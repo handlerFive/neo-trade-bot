@@ -19,13 +19,11 @@ import org.wso2.client.model.Login.InlineObject4;
 import org.wso2.client.model.Login.InlineObject5;
 import org.wso2.client.model.Login.InlineResponse2003;
 import org.wso2.client.model.Login.InlineResponse2004;
-
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import static com.handler.bot.constants.Constant.*;
+import static com.handler.bot.constants.Constant.API_SUB_KEY;
+import static com.handler.bot.constants.Constant.TOTP_LOGIN_BASE_URL;
 
 @Slf4j
 @Service
@@ -77,37 +75,6 @@ public class AuthService {
         return accessToken == null ? generateBasicToken() : accessToken;
     }
 
-    public String validateUser(String accessToken, String mobileNumber, String password) {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + accessToken);
-
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("mobileNumber", mobileNumber);
-        requestBody.put("password", password);
-
-        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
-        try {
-            ResponseEntity<String> response = restTemplate.exchange(
-                    BASE_URL,
-                    HttpMethod.POST,
-                    requestEntity,
-                    String.class
-            );
-            if (response.getStatusCode() == HttpStatus.OK) {
-                logger.info("User '{}' authenticated successfully.", response.getStatusCode());
-                return response.getBody();
-            } else {
-                logger.warn("Validation failed for user with status code '{}'", response.getStatusCode());
-                throw new RuntimeException("Validation failed: " + response.getStatusCode());
-            }
-        } catch (Exception e) {
-            logger.error("Validation error: {} ", e.getMessage(), e);
-            throw new RuntimeException("Error during validation: " + e.getMessage());
-        }
-    }
-
     public Optional<InlineResponse2003> generateViewToken(InlineObject4 payload) {
         ApiClient defaultClient = Configuration.getDefaultApiClient();
         defaultClient.setBasePath(TOTP_LOGIN_BASE_URL);
@@ -151,29 +118,8 @@ public class AuthService {
     public String getValidToken() {
         if (tokenStorage.isTokenExpired()) {
             logger.info("Token expired. Refreshing...");
-            return refreshAccessToken();
+            return generateBasicToken();
         }
         return tokenStorage.getAccessToken();
-    }
-
-    public String refreshAccessToken() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setBasicAuth("CLIENT_KEY", "CLIENT_SECRET");
-
-        HttpEntity<String> request = new HttpEntity<>("grant_type=client_credentials", headers);
-        ResponseEntity<Map> response = restTemplate.exchange(AUTH_URL, HttpMethod.POST, request, Map.class);
-
-        if (response.getStatusCode().is2xxSuccessful()) {
-            Map responseBody = response.getBody();
-            assert responseBody != null;
-            String newToken = (String) responseBody.get("access_token");
-            int expiresIn = (int) responseBody.get("expires_in");
-            tokenStorage.updateToken(newToken, expiresIn);
-            logger.info("Token refreshed successfully");
-            return newToken;
-        } else {
-            throw new RuntimeException("Failed to refresh token: " + response.getStatusCode());
-        }
     }
 }

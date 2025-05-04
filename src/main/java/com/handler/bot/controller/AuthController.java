@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.wso2.client.model.Login.InlineResponse2003;
 import org.wso2.client.model.Login.InlineResponse2003Data;
 import org.wso2.client.model.Login.InlineResponse2004;
-
 import java.util.Optional;
+import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 
 @RestController
 @RequestMapping("/api")
@@ -40,7 +40,7 @@ public class AuthController {
     public ResponseEntity<String> authenticate() {
         String accessToken = authService.generateBasicToken();
         tokenStorage.updateToken(accessToken, 18000L);
-        return ResponseEntity.ok("Auth Token " + accessToken);
+        return ResponseEntity.ok("Basic View Token Generated : " + escapeHtml4(accessToken));
     }
 
     //Totp Login
@@ -71,27 +71,7 @@ public class AuthController {
 
     @GetMapping("/token")
     public String getValidToken() {
-        return authService.getValidToken();
-    }
-
-    //Fetch Market Data
-    @GetMapping("/market")
-    public ResponseEntity<String> fetchMarketData() {
-        //TODO Call Market Data Service (To be implemented)
-        return ResponseEntity.ok("Market Data Response");
-    }
-
-    //Place Order
-    @PostMapping("/trade")
-    public ResponseEntity<String> placeTrade(@RequestBody String tradeRequest) {
-        // TODO Call Order Execution Service (To be implemented)
-        return ResponseEntity.ok("Trade Executed");
-    }
-
-    //Check Order Status
-    @GetMapping("/order/{orderId}")
-    public ResponseEntity<String> getOrderStatus(@PathVariable String orderId) {
-        // TODO Call Order Status Service (To be implemented)
-        return ResponseEntity.ok("Order Status for " + orderId);
+        String token = authService.getValidToken();
+        return escapeHtml4(token);
     }
 }
