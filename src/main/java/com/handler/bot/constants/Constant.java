@@ -12,4 +12,5 @@ public class Constant {
     public static final String ORDER_MODIFY_URL = "https://gw-napi.kotaksecurities.com/Orders/2.0/quick/order/vr/modify";
     public static final String QUOTES_URL = "https://gw-napi.kotaksecurities.com/apim/quotes/1.0";
     public static final String ORDER_CANCEL_URL = "https://gw-napi.kotaksecurities.com/Orders/2.0/quick/order/cancel";
+    public static final String POSITION_URL = "https://gw-napi.kotaksecurities.com/Orders/2.0/quick/user/trades";
 }
