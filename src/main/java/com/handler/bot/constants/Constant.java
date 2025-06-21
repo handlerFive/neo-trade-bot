@@ -13,4 +13,5 @@ public class Constant {
     public static final String QUOTES_URL = "https://gw-napi.kotaksecurities.com/apim/quotes/1.0";
     public static final String ORDER_CANCEL_URL = "https://gw-napi.kotaksecurities.com/Orders/2.0/quick/order/cancel";
     public static final String POSITION_URL = "https://gw-napi.kotaksecurities.com/Orders/2.0/quick/user/trades";
+    public static final String HOLDINGS_URL = "https://gw-napi.kotaksecurities.com/Portfolio/1.0/portfolio/v1/holdings";
 }
